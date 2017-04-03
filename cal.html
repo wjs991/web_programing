@@ -1,0 +1,1186 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+
+<html>
+
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=EUC-KR">
+
+<title>계산기</title>
+
+</head>
+
+<script type="text/javascript">
+
+	var commaCheck = false;
+
+	var Memory = 0;
+
+	var FirstNumber = 0;
+
+	var LastNumber = 0;
+
+	var result = 0; // 수식을 하고난후 1로바뀜 backspace를 못하기 위한 기능
+
+	var result1 = 0;
+
+	var NewNumber = "null";
+
+	var opvalue = "";
+
+	var PerValue = 0;
+
+	var CopyValue = 0;
+
+	var totalResult = "no";
+
+	var CheckResult = 0;
+
+	var CheckResult1 = 0;
+
+	var SecondNumber = 0;
+
+	var ZeroCheck = "no";
+
+	var comma1 = 0;
+
+	var aa = 0;
+
+	var autofinally = 0;
+
+	var temp = "";
+
+	var naga = "no";
+
+	var naga1 = "no";
+
+	var naga2 = "no";
+
+	var nagaResult = "no"
+
+	function CommaCheck() {//콤마를 사용할지 않할지를 체크
+
+		commaCheck = document.getElementById('commaCheck').checked;
+
+		Display(document.cal.val.value);
+
+	}
+
+
+	function Display(displaynumber) {
+
+		if (commaCheck == true) {//콤마를 사용할 때
+
+			comma1 = 1;
+
+			displaynumber = comma(displaynumber);
+
+		}
+
+		if (commaCheck == false && comma1 == '1') {
+
+			displaynumber = replaceComma(displaynumber);
+
+		
+
+		}
+
+		document.cal.val.value = displaynumber;
+
+		//	return;
+
+		/*   	if(displaynumber.substring(0,2)== "-,"){ // +, - 했을경우 -,333 이나올경우 대체 
+
+		//alert("Hhhhh");
+
+		var naga = displaynumber.replace("-,","-");
+
+		document.cal.val.value = naga;  
+
+		return;
+
+	}  */
+
+	}
+
+
+	function CheckNumber(val) {
+
+		if (val == ".") {
+
+			number = document.cal.val.value;
+
+			if (number == 0 && number.indexOf('.') == -1) {//처음숫자가 0일때 0. 으로 만듬
+
+				if (FirstNumber == 0) {
+
+					FirstNumber = "";
+
+				} else if (LastNumber == 0) {
+
+					LastNumber = '';
+
+				}
+
+
+				val = '0.';
+
+			} else if (number.indexOf('.') != -1) {
+
+				val = '';
+
+				if (LastNumber != 0) {
+
+					return;
+
+				}
+
+				LastNumber = '0.';
+
+			} else if (number != 0 && number.indexOf('.') == -1) {//소수점사용안하고 숫자만있을경우
+
+				LastNumber = number;
+
+				LastNumbers = '0';
+
+			}
+
+		}
+
+		if (NewNumber == "true")
+
+
+		{
+
+
+			LastNumber += val;
+
+			Display(LastNumber);
+
+		} else {
+
+			if (NewNumber == "null")//공백일경우 처음에 여기 들어옴
+
+			{
+
+				if (FirstNumber == val) {
+
+					return;
+
+				} else {
+
+					FirstNumber = val; //첫번째숫자가 입력된다
+
+					LastNumber = ""; // 두번째는 초기화(ex 수식기호를넣고 난다음에...)
+
+					NewNumber = "false";// NewNumber를 fasle바꿔주고
+
+				}
+
+			} else {
+
+				FirstNumber += val;
+
+			}
+
+			Display(FirstNumber);//이값이 디스플레이값이 보여진다.
+
+		}
+
+	}
+
+
+	function SubButton(val) { // 빼기
+
+		this.LastNumber = LastNumber.replace(",", "");
+
+		if (val == 1)
+
+			EqualButton(1);
+
+		if (CheckResult == "1" && NewNumber == "false") {
+
+			return;
+
+		}
+
+		if (LastNumber != "") {
+
+			FirstNumber = parseFloat(FirstNumber) - parseFloat(LastNumber);
+
+			SecondNumber = LastNumber;
+
+			CheckResult = 0;
+
+
+		}
+
+
+		NewNumber = "true";
+
+		opvalue = '-'; //다시 돌아오기위한
+
+		//result = 1;
+
+
+		Display(FirstNumber);
+
+	}
+
+
+	function MultButton(val) { //  곱셈
+
+		this.LastNumber = LastNumber.replace(",", "");
+
+		if (val == 1)
+
+			EqualButton(1);
+
+		if (CheckResult == "1" && NewNumber == "false") {
+
+			return;
+
+		}
+
+		if (LastNumber != "") {
+
+			FirstNumber = parseFloat(FirstNumber) * parseFloat(LastNumber);
+
+			SecondNumber = LastNumber;
+
+			CheckResult = 0;
+
+
+		}
+
+
+		NewNumber = "true";
+
+		opvalue = '*'; //다시 돌아오기위한
+
+		//result = 1;
+
+
+		Display(FirstNumber);
+
+	}
+
+
+	function DivButton(val) { // 나누기
+
+		this.LastNumber = LastNumber.replace(",", "");
+
+		if (val == 1)
+
+			EqualButton(1);
+
+		if (CheckResult == "1" && NewNumber == "false") {
+
+			return;
+
+		}
+
+		if (LastNumber != "") {
+
+			FirstNumber = parseFloat(FirstNumber) / parseFloat(LastNumber);
+
+			SecondNumber = LastNumber;
+
+			CheckResult = 0;
+
+
+		}
+
+
+		NewNumber = "true";
+
+		opvalue = '/'; //다시 돌아오기위한
+
+		//	result = 1;
+
+
+		Display(FirstNumber);
+
+	}
+
+
+	function SqrtButton()//제곱근
+
+	{
+
+		FirstNumber = Math.sqrt(FirstNumber);
+
+		Display(FirstNumber);
+
+		result = 1;
+
+	}
+
+
+	function PercentButton1(val) {
+
+		if (val == 1)
+
+			EqualButton();
+
+		if (LastNumber != "") {
+
+			FirstNumber = parseFloat(FirstNumber)
+
+					* parseFloat((LastNumber) * 0.01);//실수계산
+
+		}
+
+		NewNumber = "true";
+
+		opvalue = '%';
+
+		result = 1;
+
+		Display(FirstNumber);
+
+	}
+
+
+	function PercentButton(val) {
+
+
+		if (NewNumber != "true") { // FirstNumber가 들어올경우
+
+			AllClear();
+
+		}
+
+
+		if (NewNumber == "true") // LastNumber로 들어왔을경우만
+
+		{
+
+			if (PerValue == "0") {
+
+				PerValue = parseFloat(FirstNumber)
+
+						* parseFloat((LastNumber) * 0.01);
+
+			} else {
+
+				PerValue = parseFloat(FirstNumber)
+
+						* parseFloat((document.cal.val.value) * 0.01);
+
+
+			}
+
+			result = 1;
+
+			Display(PerValue);
+
+		}
+
+	}
+
+
+	function AllClear() { //초기화
+
+
+		FirstNumber = 0;
+
+		LastNumber = 0;
+
+		result = 0; // 수식을 하고난후 1로바뀜 backspace를 못하기 위한 기능
+
+		result1 = 0;
+
+		NewNumber = "null";
+
+		opvalue = "";
+
+		PerValue = 0;
+
+		CopyValue = 0;
+
+		totalResult = "no";
+
+		CheckResult = 0;
+
+		CheckResult1 = 0;
+
+		SecondNumber = 0;
+
+		resultCheck = "yes";
+
+		ZeroCheck = "no";
+
+		comma1 = 0;
+
+		aa = 0;
+
+		autofinally = 0;
+
+		naga = "no";
+
+		naga1 = "no";
+
+		naga2 = "no";
+
+		Display("0");
+
+	}
+
+	function CEclear() //lastnumber 만 초기화 하고싶을때
+
+	{
+
+		LastNumber = "";
+
+		Display("");
+
+	}
+
+
+	function RecipButton()//역수
+
+	{
+
+		FirstNumber = 1 / FirstNumber;
+
+		NewNumber = "null";
+
+		result = 1;
+
+		Display(FirstNumber);
+
+	}
+
+
+	function NagateButton() {
+
+		nagaResult = "yes";
+
+		if (NewNumber == "false" && naga == "no") { // +/- 눌럿을때 기본적으러 한번 수행함
+
+			FirstNumber = '-' + (FirstNumber);
+
+			Display(FirstNumber);
+
+			naga = "yes";
+
+			naga2 = "no";
+
+			return;
+
+		} else if (naga == "yes" && NewNumber == "false") { // 조건바꺼주고 + 로 변화 시켜줌
+
+			FirstNumber = FirstNumber.replace("-", "");
+
+			Display(FirstNumber);
+
+			naga = "no";
+
+			naga2 = "no";
+
+			return;
+
+
+		}
+
+
+		if (NewNumber == "true" && naga == "no") {
+
+			if (document.cal.val.value == FirstNumber) {
+
+				Display(FirstNumber);
+
+			} else if (naga1 == "yes" && naga == "no") {
+
+				LastNumber = LastNumber.replace("-", "");
+
+				naga = "yes";
+
+				NewNumber = "true";
+
+				Display(LastNumber);
+
+				return;
+
+			}
+
+		}
+
+		if (NewNumber == "true" && naga2 == "no") {
+
+			LastNumber = LastNumber.replace("", "-");
+
+			naga = "no";
+
+			naga1 = "yes";
+
+
+			Display(LastNumber);
+
+			return;
+
+		}
+
+
+	}
+
+
+	function Backspace(val) {
+
+		if (result == '1') {
+
+			return; //결과값이 나왔을때 지울수없게 만듬
+
+		}
+
+		vallength = val.length;
+
+		val = val.substring(0, vallength - 1);
+
+		if (FirstNumber != "") {
+
+			FirstNumber = val.toString();
+
+			FirstNumber = replaceComma(FirstNumber);
+
+			Display(FirstNumber);
+
+		} else {
+
+			LastNumber = val.toString();
+
+			LastNumber = replaceComma(LastNumber);
+
+			Display(LastNumber);
+
+		}
+
+
+	}
+
+
+	function MemorySave(val) {
+
+		Memory = val;
+
+		FirstNumber = "";
+
+		LastNumber = "";
+
+		document.cal.memory.value = " M ";
+
+		result = 1;
+
+		alert(val + " 값을 Save.");
+
+	}
+
+
+	function MemoryRedirect(val) {
+
+		alert(val + " 값을 Reload.");
+
+		FirstNumber = val;
+
+		Display(val);
+
+	}
+
+
+	function MemoryClear() {
+
+		Memory = "";
+
+		document.cal.memory.value = "";
+
+
+	}
+
+	function MemoryAdd(val) {
+
+		Memory = parseFloat(Memory) + parseFloat(eval(val));
+
+		document.cal.memory.value = " M ";
+
+		NewNumber = "null";
+
+	}
+
+
+	function FinnalResult(val) {
+
+		if (opvalue == '+' && val != '1' && CheckResult == '1') {
+
+			FirstNumber = parseFloat(FirstNumber) + parseFloat(SecondNumber);
+
+		} else if (opvalue == '-' && val != '1' && CheckResult == '1') {
+
+			FirstNumber = parseFloat(FirstNumber) - parseFloat(SecondNumber);
+
+		} else if (opvalue == '*' && val != '1' && CheckResult == '1') {
+
+			FirstNumber = parseFloat(FirstNumber) * parseFloat(SecondNumber);
+
+
+		} else if (opvalue == '/' && val != '1' && CheckResult == '1') {
+
+			FirstNumber = parseFloat(FirstNumber) / parseFloat(SecondNumber);
+
+		}
+
+		Display(FirstNumber);
+
+		CheckResult = 1;
+
+
+	}
+
+
+	function AddButton(val) // 더하기
+
+	{
+
+		this.LastNumber = LastNumber.replace(",", "");
+
+		if (val == 1)
+
+			EqualButton(1);
+
+		if (CheckResult == "1" && NewNumber == "false") {
+
+			return;
+
+		}
+
+		if (LastNumber != "") {
+
+			FirstNumber = parseFloat(FirstNumber) + parseFloat(LastNumber);
+
+			SecondNumber = LastNumber;
+
+			CheckResult = 0;
+
+			/* if(nagaResult=="yes"){
+
+				alert("nagaresult");
+
+			LastNumber=""; //naga 를 햇을경우 2번째값이 초기화가안되서임
+
+			} */
+
+			Display(FirstNumber);
+
+			return;
+
+		}
+
+		NewNumber = "true";
+
+		opvalue = '+'; //다시 돌아오기위한
+
+		//result = 1;
+
+
+		Display(FirstNumber);
+
+	}
+
+
+	function EqualButton(val) // =
+
+	{
+
+		if (opvalue == "+") {
+
+			result = 1;
+
+			AddButton(0);
+
+			FinnalResult(val);
+
+		}
+
+		if (opvalue == "-") {
+
+			SubButton(0);
+
+			FinnalResult(val);
+
+		}
+
+		if (opvalue == "*") {
+
+			MultButton(0);
+
+			FinnalResult(val);
+
+		}
+
+		if (opvalue == "/") {
+
+			DivButton(0);
+
+			FinnalResult(val);
+
+		}
+
+		if (opvalue == "%") {
+
+			PercentButton(0);
+
+		}
+
+		LastNumber = "";
+
+		// alert("여기도안오냐?");
+
+		Display(FirstNumber);
+
+	}
+
+
+	function copyda(val) {
+
+		if (val == "=" && autofinally == '1') {
+
+			//alert(aa); 
+
+			Display(aa);
+
+			return;
+
+		}
+
+		var FirstNum = "";
+
+		var LastNum = "";
+
+		var Modistr = "";
+
+		if (val != "=") {
+
+			CopyValue = (prompt("*** 계산할 값을 복사해서 넣으세요. *** ", ""));
+
+		}
+
+		for ( var i = 0; i <= CopyValue.length; i++) {
+
+			if (CopyValue[i] >= 0 && Modistr == "") {
+
+				FirstNum += CopyValue[i];
+
+			} else if (CopyValue[i] >= 0 && FirstNum != "" && Modistr != "") {
+
+				LastNum += CopyValue[i];
+
+			} else if (FirstNum != "" && Modistr != "" && LastNum != "") {
+
+				var calResult = "";
+
+				var autocal = "";
+
+				calResult = FirstNum + Modistr + LastNum;
+
+				autocal = eval(calResult);
+
+				if (undefined == CopyValue[i + 1]) {
+
+					FirstNum = autocal;
+
+					if (CopyValue[i] == '=') {
+
+						Display(FirstNum);
+
+						return;
+
+					} else if (autocal[i] != '=') {
+
+						Display(LastNum);
+
+						aa = autocal;
+
+						autofinally = 1;
+
+						return;
+
+					}
+
+				}
+
+				i = i - 1;
+
+				Modistr = "";
+
+				LastNum = "";
+
+				FirstNum = autocal;
+
+				Display(autocal);
+
+
+			} else {
+
+				Modistr = CopyValue[i];
+
+			}
+
+		}
+
+	}
+
+	function comma(str) {
+
+		var oneSplit = '';
+
+		str = new String(str);
+
+		this.str = str;
+
+		len = str.length;
+
+		str1 = "";
+
+		str = replaceComma(str);
+
+
+		if (str.indexOf('.') > 0) {
+
+			oneSplit = str.split('.', str);
+
+			var oneSplitLeng = oneSplit[0].length;
+
+			if (oneSplit[1] == '') {//스플릿하고 소수점뒤가 없는경우
+
+				for ( var i = 1; i <= oneSplitLeng; i++) {
+
+					str1 = oneSplit[0].charAt(oneSplitLeng - i) + str1;
+
+					if ((i % 3 == 0) && (oneSplitLeng - i != 0)) {
+
+						str1 = ',' + str1;
+
+						//alert( str1.indexOf("-"));
+
+						//alert(str.length);
+
+					}
+
+				}
+
+				str1 = str1 + '.';
+
+				if((str1.length-1 ) % 4 == 0 && str1.indexOf("-") == 0 && str1.indexOf(",") >= 0){
+
+					str1 = str1.replace(",",""); // -,333 바꿔줌 -> -333
+
+				}
+
+				return str1;
+
+			} else if (oneSplit[1] != '') {//스플릿하고 소수점뒤가 있을때
+
+				for ( var i = 1; i <= oneSplitLeng; i++) {
+
+					str1 = oneSplit[0].charAt(oneSplitLeng - i) + str1;
+
+					if ((i % 3 == 0) && (oneSplitLeng - i != 0)) {
+
+						str1 = ',' + str1;
+
+						
+
+					}
+
+				}
+
+			
+
+				str1 = str1 + '.' + oneSplit[1];
+
+				return str1;
+
+			}
+
+		} else { // 소수점없을대
+
+			for ( var i = 1; i <= len; i++) {
+
+				str1 = str.charAt(len - i) + str1;
+
+				/* 	alert(str1.substring(0,2));
+
+					if(str1.substring(0,2)=="-,"){
+
+						str1.replace("-,",""); 
+
+					}*/
+
+				if ((i % 3 == 0) && (len - i != 0)) {
+
+					str1 = ',' + str1;
+
+					/* 	if (str.substring(0,1)=="-"){
+
+								alert("str5 = "+str);
+
+						} */
+
+				}
+
+			}
+
+			//alert(str1.indexOf("-"));
+
+			//alert(str1.indexOf(","));
+
+			//alert(str.length);
+
+			if((str1.length-1 ) % 4 == 0 && str1.indexOf("-") == 0 && str1.indexOf(",") >= 0){
+
+				str1 = str1.replace(",",""); // -,333 바꿔줌 -> -333
+
+			}
+
+			/* if((str1.length ) % 1 == 0 && str1.indexOf("-") == 0 && str1.indexOf(",") >= 0){
+
+				str1 = str1.replace(",","");  // -,333 바꿔줌 -> -333
+
+			} */
+
+			return str1;
+
+		}
+
+	}
+
+
+	function replaceComma(display) { // 콤마 없애기 
+
+		while (display.indexOf(",") > -1) {
+
+			display = display.replace(",", "");
+
+		}
+
+		return display;
+
+	}
+
+</script>
+
+
+
+<body onload="parent.resizeTo(400,430)">
+
+	<form name="cal">
+
+		<table border=1 align="center">
+
+
+			<tr>
+
+				<td colspan="6" bgcolor="blue" align="center"><b
+
+					style="color: white"> 계산기</b></td>
+
+			</tr>
+
+
+			<tr>
+
+				<!--<td colspan="2" style="font-size: 13px;">붙여넣기</td>
+
+		<td colspan="4">
+
+			<input type="text"  size="31%" name="copyview" value="">
+
+		</td> -->
+
+			</tr>
+
+			<tr>
+
+				<td colspan=6><input type="text" value="0" name="val" size=44 maxlength=30></td>
+
+			</tr>
+
+
+			<tr>
+
+				<td colspan="6">
+
+					<table border=0>
+
+						<tr>
+
+							<td align="center"><input type="text" name="memory" size=5>
+
+								<input type="button" name="backspace" style="color: red"
+
+								value=" ← " onclick="Backspace(document.cal.val.value);">
+
+								<input type="button" name="CE" style="color: red" value=" CE "
+
+								onclick="CEclear();"> <!-- 이넘은 LastNumber를 잘못 입력했을때 LastNumber를 초기화 -->
+
+								<input type="button" name="C" style="color: red" value="  C  "
+
+								onclick="AllClear(1);"> <!-- 이넘은 완전초기화 기능 --> <input
+
+								type="button" value=" 복사해서 넣기 " style="color: red"
+
+								onclick="copyda();">
+
+						</tr>
+
+						<tr>
+
+							<td><input type="checkbox" id="commaCheck" align="right"
+
+								onclick="CommaCheck();"> <font size="3"
+
+								style="font-family: 궁서체;">자릿수 구분 단위</font></td>
+
+							<!--      	<td colspan="2">
+
+				<input type="button" onclick="copyda(document.cal.copyview.value);" value="복사">
+
+		</td> -->
+
+						</tr>
+
+					</table>
+
+			<tr>
+
+				<td align="center"><input type="button" name="MC"
+
+					style="color: red" value=" MC " onclick="MemoryClear();"></td>
+
+				<td align="center"><input type="button" name="calc7"
+
+					style="color: blue" value="  7  " onclick="CheckNumber('7');"></td>
+
+				<td align="center"><input type="button" name="calc8"
+
+					style="color: blue" value="  8  " onclick="CheckNumber('8');"></td>
+
+				<td align="center"><input type="button" name="calc9"
+
+					style="color: blue" value="  9  " onclick="CheckNumber('9');"></td>
+
+				<td align="center"><input type="button" name="divide"
+
+					style="color: red" value="  /  " onclick="DivButton(1);"></td>
+
+				<td align="center"><input type="button" name="sqrt"
+
+					style="color: blue" value="sqrt " onclick="SqrtButton();"></td>
+
+			</tr>
+
+
+			<tr>
+
+				<td align="center"><input type="button" name="MR"
+
+					style="color: red" value=" MR " onclick="MemoryRedirect(Memory);"></td>
+
+				<td align="center"><input type="button" name="calc4"
+
+					style="color: blue" value="  4  " onclick="CheckNumber('4');"></td>
+
+				<td align="center"><input type="button" name="calc5"
+
+					style="color: blue" value="  5  " onclick="CheckNumber('5');"></td>
+
+				<td align="center"><input type="button" name="calc6"
+
+					style="color: blue" value="  6  " onclick="CheckNumber('6');"></td>
+
+				<td align="center"><input type="button" name="multiply"
+
+					style="color: red" value="  *  " onclick="MultButton(1);"></td>
+
+				<td align="center"><input type="button" name="percent"
+
+					style="color: blue" value="  %  " onclick="PercentButton(1);"></td>
+
+			</tr>
+
+
+			<tr>
+
+				<td align="center"><input type="button" name="MS"
+
+					style="color: red" value=" MS "
+
+					onclick="MemorySave(document.cal.val.value);"></td>
+
+				<td align="center"><input type="button" name="calc1"
+
+					style="color: blue" value="  1  " onclick="CheckNumber('1');"></td>
+
+				<td align="center"><input type="button" name="calc2"
+
+					style="color: blue" value="  2  " onclick="CheckNumber('2');"></td>
+
+				<td align="center"><input type="button" name="calc3"
+
+					style="color: blue" value="  3  " onclick="CheckNumber('3');"></td>
+
+				<td align="center"><input type="button" name="minus"
+
+					style="color: red" value="  -  " onclick="SubButton(1);"></td>
+
+				<td align="center"><input type="button" name="recip"
+
+					style="color: blue" value=" 1/x " onclick="RecipButton();"></td>
+
+			</tr>
+
+
+			<tr>
+
+				<td align="center"><input type="button" name="MPlus"
+
+					style="color: red" value=" M+  "
+
+					onclick="MemoryAdd(document.cal.val.value);"></td>
+
+				<td align="center"><input type="button" name="calc0"
+
+					style="color: blue" value="  0  " onclick="CheckNumber('0');"></td>
+
+				<td align="center"><input type="button" name="negate"
+
+					style="color: blue" value=" +/- " onclick="NagateButton();"></td>
+
+				<td align="center"><input type="button" name="dot"
+
+					style="color: blue" value="  .   "
+
+					onclick="CheckNumber('..');return false;"></td>
+
+				<td align="center"><input type="button" name="plus"
+
+					style="color: blue" style="color: red" value="  +  "
+
+					onclick="AddButton(1); return false;"></td>
+
+				<td align="center"><input type="button" name="equal"
+
+					style="color: red" value="   =   "
+
+					onclick="EqualButton(); copyda('=');return false;"></td>
+
+			</tr>
+
+		</table>
+
+	</form>
+
+</body>
+
+</html>
