@@ -1,0 +1,306 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>paint</title>
+    <style>
+        body {
+            margin: 15px;
+        }
+
+        canvas {
+            cursor: crosshair;
+            border: solid 2px #000;
+            margin: 15px 0 0 0;
+            -webkit-box-shadow: 1px 1px 20px #ccc;
+            -moz-box-shadow: 1px 1px 20px #ccc;
+            box-shadow: 1px 1px 20px #ccc;
+        }
+
+        input {
+            border: 1px solid #000;
+            margin-top: 10px;
+            padding: 5px 10px 5px 10px ;
+            text-align: center;
+        }
+        .button:hover{
+            background-color: black;
+            color: wheat;
+            font-weight: 900; /* font-weight:글자 굵기*/
+            cursor: pointer;
+        }
+    </style>
+    <script>
+    var SHAPE_LINE = 1; //직선
+    var SHAPE_RECTANGLE = 2; //사각형
+    var SHAPE_CIRCLE = 3; //원
+    var SHAPE_TRIALNGLE = 4;//삼각형
+    var SHAPE_SEMICIRCLE = 5;//반원
+
+
+
+    var CLICK_NONE = 0; //캔버스 위에서 한 번도 클릭하지 않은 상태
+    var CLICK_ONCE = 1; //캔버스 위에서 한 번 클릭한 상태
+
+
+
+    var x_once = 0; //첫 번째 클릭한 X 좌표
+    var y_once = 0; //첫 번째 클릭한 Y 좌표
+    var x_twice = 0; //두 번째 클릭한 X 좌표
+    var y_twice = 0; //두 번째 클릭한 Y 좌표
+
+
+        var width_line=1;//선 굵기
+        var canvas;
+        var ctx;
+        var flag = false;
+        var article_flag = false;
+        var currentShpae = SHAPE_CIRCLE; //선택한 도형
+        var clickedCount = CLICK_NONE;
+        //캔버스 위에서 클릿한 횟수
+        var ready = function() { //초기화
+            canvas = document.getElementById("canvas");
+            ctx = canvas.getContext("2d");
+        }
+        var w_plus=function(){
+          width_line++;
+          ctx.lineWidth=width_line;
+        }
+        var w_min=function(){
+          width_line--;
+          ctx.lineWidth=width_line;
+        }
+        var w = function(width) {
+            ctx.lineWidth = width;
+        }
+        var black = function() {
+            ctx.strokeStyle = '#000000';
+        }
+        var red = function() {
+            ctx.strokeStyle = '#ff0000';
+        }
+        var green = function() {
+            ctx.strokeStyle = '#00ff00';
+        }
+        var blue = function() {
+            ctx.strokeStyle = '#0000ff';
+        }
+        var yellow = function() {
+            ctx.strokeStyle = '#ffff00';
+        }
+        var line_draw = function(){
+          article_flag=false;
+        }
+        var drawStart = function(event) {
+            ctx.beginPath();
+            var xpos = event.target.offsetLeft;
+            var ypos = event.target.offsetTop;
+            ctx.moveTo(event.clientX - xpos, event.clientY - ypos);
+            flag = true;
+        }
+        var drawing = function(event) {
+            if (flag) {
+                var xpos = event.target.offsetLeft;
+                var ypos = event.target.offsetTop;
+                ctx.lineCap = 'round'
+                ctx.lineTo(event.clientX - xpos, event.clientY - ypos);
+                ctx.stroke();
+            }
+        }
+        var drawEnd = function(event) {
+            flag = false;
+        }
+        var save = function() {
+            window.open(canvas.toDataURL());
+        }
+
+        function selectShape(shape) {
+            article_flag=true;
+            currentShpae = shape;
+        }
+
+        function clickShape(event) {
+          var rect = canvas.getBoundingClientRect();
+          if(article_flag==true){
+            canvas.onmousedown = "";
+            canvas.onmousemove = "";
+            window.onmouseup = "";
+            flag = false;
+            switch (clickedCount) {
+
+                case CLICK_NONE:
+
+                    //아직 클릭하지 않은 상태일 때(한 번 클릭했을 때)
+
+                    x_once = event.clientX-rect.left; //첫 번째 클릭한 X 좌표 저장
+
+                    y_once = event.clientY-rect.top; //첫 번째 클릭한 Y 좌표 저장
+
+                    x_twice = 0;
+
+                    y_twice = 0;
+
+
+
+                    clickedCount = CLICK_ONCE; //한 번 클릭한 상태로 변경
+
+                    break;
+
+                case CLICK_ONCE:
+
+                    //한 번 클릭한 상태일 때(두 번 클릭했을 때)
+
+                    x_twice = event.clientX-rect.left; //두 번째 클릭한 X 좌표 저장
+
+                    y_twice = event.clientY-rect.top; //두 번째 클릭한 Y 좌표 저장
+
+
+
+                    drawShape(); //도형 그리기
+
+
+
+                    clickedCount = CLICK_NONE; //아직 클릭하지 않은 상태로 변경(초기화)
+
+                    break;
+
+            }
+          }
+          else {
+            canvas.onmousedown = drawStart;
+            canvas.onmousemove = drawing;
+            window.onmouseup = drawEnd;
+          }
+
+        }
+
+
+
+        //도형 그리기
+
+        function drawShape() {
+
+            //선택한 도형 확인
+
+            switch (currentShpae) {
+
+                case SHAPE_LINE:
+
+                    //직선
+
+                    ctx.beginPath(); //도형 그리기 시작
+
+                    ctx.moveTo(x_once, y_once); //첫 번째 점 이동
+
+                    ctx.lineTo(x_twice, y_twice); //두 번째 점으로 선 그리기
+
+                    ctx.stroke(); //도형 그리기
+
+                    break;
+
+                case SHAPE_RECTANGLE:
+
+                    //사각형
+
+                    var x = x_twice - x_once;
+
+                    var y = y_twice - y_once;
+
+
+
+                    ctx.beginPath(); //도형 그리기 시작
+
+                    ctx.rect(x_once, y_once, x, y ); //사각형 그리기
+
+                    ctx.stroke(); //도형 그리기
+
+                    break;
+
+                case SHAPE_CIRCLE:
+
+                    //원
+
+                    var x =x_twice - x_once;
+
+                    var y =y_twice - y_once;
+
+                    var abs_x=Math.abs(x);
+
+                    ctx.beginPath(); //도형 그리기 시작
+
+
+
+                    ctx.arc(x_once + x / 2 , y_once + y / 2 , abs_x / 2 , 0, 2 * Math.PI); //원 그리기(360도 호 그리기)
+
+                    ctx.stroke(); //도형 그리기
+
+                    break;
+
+                case SHAPE_TRIALNGLE:
+                  //삼각형
+                  var x =x_twice - x_once;
+
+                  var y =y_twice - y_once;
+                      ctx.beginPath(); //도형 그리기 시작
+                      ctx.moveTo(x_once+x/2, y_once+y); //첫 번째 점 이동
+                      ctx.lineTo(x_twice, y_twice); //두 번째 점으로 선 그리기
+                      ctx.lineTo(x_twice, y_once-y);
+                      ctx.closePath();
+                        ctx.stroke(); //도형 그리기
+                    break;
+                case SHAPE_SEMICIRCLE:
+                //반원
+
+                var x =x_twice - x_once;
+
+                var y =y_twice - y_once;
+
+                var abs_x=Math.abs(x);
+
+                ctx.beginPath(); //도형 그리기 시작
+
+                ctx.arc(x_once + x / 2 , y_once + y / 2 , abs_x / 2 , 0, Math.PI); //원 그리기(360도 호 그리기)
+
+                ctx.moveTo(x_once, y_once+ y / 2); //첫 번째 점 이동
+
+                ctx.lineTo(x_twice, y_once+y/2); //두 번째 점으로 선 그리기
+
+                ctx.stroke(); //도형 그리기
+
+                  break;
+            }
+
+        }
+
+        var erase = function() {
+          canvas.width = canvas.width;
+        }
+    </script>
+</head>
+
+<body onload="ready()">
+  <canvas id="canvas" width="1000" height="500" onclick="clickShape(event);"></canvas>
+    <div>
+        <input class="button" value="PNG파일로 저장" onclick="save()"></input>
+        <input class="button" value="새로 그리기" onclick="erase()"></input>
+        |
+        <input class="button" value="선" onclick="line_draw();"></input>
+        <input class="button" value="펜 굵게" onclick="w_plus()"></input>
+        <input class="button" value="펜 초기화" onclick="w(1)"></input>
+        <input class="button" value="펜 얇게" onclick="w_min()"></input>
+        |
+        <input class="button" value="검정" onclick="black()"></input>
+        <input class="button" value="빨강" onclick="red()"></input>
+        <input class="button" value="파랑" onclick="blue()"></input>
+        <input class="button" value="초록" onclick="green()"></input>
+        <input class="button" value="노랑" onclick="yellow()"></input>
+        |
+        <input class="button" value="사각형" onclick="selectShape(SHAPE_RECTANGLE)"></input>
+        <input class="button" value="원" onclick="selectShape(SHAPE_CIRCLE)"></input>
+        <input class="button" value="직선" onclick="selectShape(SHAPE_LINE)"></input>
+        <input class="button" value="삼각형" onclick="selectShape(SHAPE_TRIALNGLE)"></input>
+        <input class="button" value="반원" onclick="selectShape(SHAPE_SEMICIRCLE)"></input>
+    </div>
+
+</body>
